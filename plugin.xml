@@ -20,6 +20,8 @@
   </platform>
 
   <platform name="android">
+    <hook type="after_prepare" src="scripts/copy_google_services_config_files.js" />
+    
     <js-module src="www/crashlytics.js" name="FirebaseCrashlytics">
       <clobbers target="FirebaseCrashlytics"/>
     </js-module>
@@ -53,6 +55,8 @@
   </platform>
 
   <platform name="ios">
+    <hook type="after_prepare" src="scripts/copy_google_services_config_files.js" />
+    
     <js-module src="www/crashlytics.js" name="FirebaseCrashlytics">
       <clobbers target="FirebaseCrashlytics"/>
     </js-module>
