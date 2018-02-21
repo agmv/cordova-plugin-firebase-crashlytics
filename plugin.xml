@@ -47,6 +47,8 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firebase/crashlytics/SetDoubleHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firebase/crashlytics"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firebase/crashlytics/SetFloatHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firebase/crashlytics"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firebase/crashlytics/SetIntHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firebase/crashlytics"/>
+    
+    <resource-file src="google-services.json" target="google-services.json" />
 
   </platform>
 
@@ -66,6 +68,8 @@
 
     <header-file src="src/ios/FirebaseCrashlyticsPlugin.h"/>
     <source-file src="src/ios/FirebaseCrashlyticsPlugin.m"/>
+    
+    <resource-file src="GoogleService-Info.plist" />
   </platform>
 
 </plugin>
