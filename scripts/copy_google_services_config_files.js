@@ -6,8 +6,22 @@
  * will build properly and have the required key files copied to the proper destinations when the app is build on Ionic Cloud using the package command.
  * Credits: https://github.com/arnesson.
  */
-var fse = require('fs-extra');
-var config = fse.readFileSync('config.xml').toString();
+var fs = require('fs');
+var path = require('path');
+
+fs.ensureDirSync = function (dir) {
+    if (!fs.existsSync(dir)) {
+        dir.split(path.sep).reduce(function (currentPath, folder) {
+            currentPath += folder + path.sep;
+            if (!fs.existsSync(currentPath)) {
+                fs.mkdirSync(currentPath);
+            }
+            return currentPath;
+        }, '');
+    }
+};
+
+var config = fs.readFileSync('config.xml').toString();
 var name = getValue(config, 'name');
 
 var IOS_DIR = 'platforms/ios';
@@ -16,8 +30,8 @@ var ANDROID_DIR = 'platforms/android';
 var PLATFORM = {
     IOS: {
         dest: [
-            IOS_DIR + name + '/Resources/GoogleService-Info.plist',
-            IOS_DIR + name + '/Resources/Resources/GoogleService-Info.plist'
+            IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
+            IOS_DIR + '/' + name + '/Resources/Resources/GoogleService-Info.plist'
         ],
         src: [
             'GoogleService-Info.plist',
@@ -38,16 +52,9 @@ var PLATFORM = {
     }
 };
 
-// Copy key files to their platform specific folders
-if (directoryExists(IOS_DIR)) {
-    copyKey(PLATFORM.IOS);
-} else if (directoryExists(ANDROID_DIR)) {
-    copyKey(PLATFORM.ANDROID, updateStringsXml)
-}
-
 function updateStringsXml(contents) {
     var json = JSON.parse(contents);
-    var strings = fse.readFileSync(PLATFORM.ANDROID.stringsXml).toString();
+    var strings = fs.readFileSync(PLATFORM.ANDROID.stringsXml).toString();
 
     // strip non-default value
     strings = strings.replace(new RegExp('<string name="google_app_id">([^\@<]+?)</string>', 'i'), '');
@@ -64,7 +71,7 @@ function updateStringsXml(contents) {
     // replace the default value
     strings = strings.replace(new RegExp('<string name="google_api_key">([^<]+?)</string>', 'i'), '<string name="google_api_key">' + json.client[0].api_key[0].current_key + '</string>');
 
-    fse.writeFileSync(PLATFORM.ANDROID.stringsXml, strings);
+    fs.writeFileSync(PLATFORM.ANDROID.stringsXml, strings);
 }
 
 function copyKey(platform, callback) {
@@ -72,13 +79,13 @@ function copyKey(platform, callback) {
         var file = platform.src[i];
         if (fileExists(file)) {
             try {
-                var contents = fse.readFileSync(file).toString();
+                var contents = fs.readFileSync(file).toString();
 
                 try {
                     platform.dest.forEach(function (destinationPath) {
                         var folder = destinationPath.substring(0, destinationPath.lastIndexOf('/'));
-                        fse.ensureDirSync(folder);
-                        fse.writeFileSync(destinationPath, contents);
+                        fs.ensureDirSync(folder);
+                        fs.writeFileSync(destinationPath, contents);
                     });
                 } catch (e) {
                     // skip
@@ -105,7 +112,7 @@ function getValue(config, name) {
 
 function fileExists(path) {
     try {
-        return fse.statSync(path).isFile();
+        return fs.statSync(path).isFile();
     } catch (e) {
         return false;
     }
@@ -113,8 +120,22 @@ function fileExists(path) {
 
 function directoryExists(path) {
     try {
-        return fse.statSync(path).isDirectory();
+        return fs.statSync(path).isDirectory();
     } catch (e) {
         return false;
     }
 }
+
+module.exports = function(context) {
+  //get platform from the context supplied by cordova
+  var platforms = context.opts.platforms;
+  // Copy key files to their platform specific folders
+  if (platforms.indexOf('ios') !== -1 && directoryExists(IOS_DIR)) {
+    console.log('Preparing Firebase on iOS');
+    copyKey(PLATFORM.IOS);
+  }
+  if (platforms.indexOf('android') !== -1 && directoryExists(ANDROID_DIR)) {
+    console.log('Preparing Firebase on Android');
+    copyKey(PLATFORM.ANDROID, updateStringsXml)
+  }
+};
