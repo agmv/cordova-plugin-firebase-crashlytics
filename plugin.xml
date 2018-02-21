@@ -66,7 +66,6 @@
     <header-file src="src/ios/FirebaseCrashlyticsPlugin.h"/>
     <source-file src="src/ios/FirebaseCrashlyticsPlugin.m"/>
     
-    <resource-file src="src/ios/GoogleService-Info.plist" target="Resources/GoogleService-Info.plist" />
   </platform>
   
   <hook type="after_prepare" src="scripts/copy_google_services_config_files.js" />
