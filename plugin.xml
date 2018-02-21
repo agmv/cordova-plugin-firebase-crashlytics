@@ -73,7 +73,7 @@
     <header-file src="src/ios/FirebaseCrashlyticsPlugin.h"/>
     <source-file src="src/ios/FirebaseCrashlyticsPlugin.m"/>
     
-    <resource-file src="GoogleService-Info.plist" target="../../www/GoogleService-Info.plist"/>
+    <resource-file src="GoogleService-Info.plist" />
   </platform>
 
 </plugin>
